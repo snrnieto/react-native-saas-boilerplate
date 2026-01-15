@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "saas-boilerplate",
-    "slug": "saas-boilerplate",
+    "name": "react-native-saas-boilerplate",
+    "slug": "react-native-saas-boilerplate",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
