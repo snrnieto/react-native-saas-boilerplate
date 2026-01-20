@@ -1,0 +1,400 @@
+/**
+ * Supabase Auth Adapter
+ * 
+ * Concrete implementation of IAuthService using Supabase as the authentication provider.
+ * This adapter translates Supabase Auth API calls to our application's auth interface.
+ * 
+ * Features:
+ * - Email/Password authentication (fully implemented)
+ * - Session management with auto-refresh
+ * - Password reset and profile updates
+ * - OAuth ready (Google implementation prepared for future)
+ */
+
+import type { IAuthService } from '../../services/auth/IAuthService';
+import type {
+    AuthResponse,
+    AuthSession,
+    AuthStateChangeCallback,
+    AuthUser,
+    OAuthProvider,
+    PasswordResetResponse,
+    ProfileUpdateData,
+    UserMetadata,
+} from '../../services/auth/types';
+import { AuthError, AuthErrorCode } from '../../services/auth/types';
+
+import { supabaseClient } from './client';
+import {
+    mapSupabaseErrorToAuthError,
+    mapSupabaseSessionToAuthSession,
+    mapSupabaseUserToAuthUser,
+} from './mappers';
+
+export class SupabaseAuthAdapter implements IAuthService {
+    // ============================================
+    // AUTHENTICATION METHODS
+    // ============================================
+
+    /**
+     * Register a new user with email and password
+     */
+    async signUp(
+        email: string,
+        password: string,
+        metadata?: UserMetadata
+    ): Promise<AuthResponse> {
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name: metadata?.name,
+                        avatar_url: metadata?.avatarUrl,
+                    },
+                },
+            });
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to sign up');
+            }
+
+            if (!data.user || !data.session) {
+                throw new AuthError(
+                    AuthErrorCode.UNKNOWN_ERROR,
+                    'Sign up succeeded but no user or session returned'
+                );
+            }
+
+            return {
+                user: mapSupabaseUserToAuthUser(data.user),
+                session: mapSupabaseSessionToAuthSession(data.session),
+            };
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to sign up');
+        }
+    }
+
+    /**
+     * Sign in with email and password
+     */
+    async signIn(email: string, password: string): Promise<AuthResponse> {
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to sign in');
+            }
+
+            if (!data.user || !data.session) {
+                throw new AuthError(
+                    AuthErrorCode.UNKNOWN_ERROR,
+                    'Sign in succeeded but no user or session returned'
+                );
+            }
+
+            return {
+                user: mapSupabaseUserToAuthUser(data.user),
+                session: mapSupabaseSessionToAuthSession(data.session),
+            };
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to sign in');
+        }
+    }
+
+    /**
+     * Sign in with OAuth provider (Google, Apple, GitHub, etc.)
+     * 
+     * TODO: Implement OAuth flow for mobile and web
+     * - Web: Use supabase.auth.signInWithOAuth({ provider })
+     * - Mobile: Use expo-web-browser for OAuth flow
+     * 
+     * Example implementation for Google:
+     * ```typescript
+     * if (Platform.OS === 'web') {
+     *   const { data, error } = await supabaseClient.auth.signInWithOAuth({
+     *     provider: 'google',
+     *     options: {
+     *       redirectTo: window.location.origin,
+     *     },
+     *   });
+     * } else {
+     *   // Mobile: Use expo-web-browser
+     *   const { data, error } = await supabaseClient.auth.signInWithOAuth({
+     *     provider: 'google',
+     *     options: {
+     *       redirectTo: 'myapp://auth/callback',
+     *       skipBrowserRedirect: true,
+     *     },
+     *   });
+     *   // Open browser with data.url using expo-web-browser
+     * }
+     * ```
+     */
+    async signInWithProvider(provider: OAuthProvider): Promise<AuthResponse> {
+        throw new AuthError(
+            AuthErrorCode.OAUTH_PROVIDER_ERROR,
+            `OAuth provider "${provider}" is not yet implemented. Coming soon!`
+        );
+    }
+
+    /**
+     * Sign out the current user
+     */
+    async signOut(): Promise<void> {
+        try {
+            const { error } = await supabaseClient.auth.signOut();
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to sign out');
+            }
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to sign out');
+        }
+    }
+
+    // ============================================
+    // SESSION & USER METHODS
+    // ============================================
+
+    /**
+     * Get the currently authenticated user
+     */
+    async getCurrentUser(): Promise<AuthUser | null> {
+        try {
+            const { data, error } = await supabaseClient.auth.getUser();
+
+            if (error) {
+                // If there's an error getting the user, they're likely not authenticated
+                // Don't throw, just return null
+                return null;
+            }
+
+            if (!data.user) {
+                return null;
+            }
+
+            return mapSupabaseUserToAuthUser(data.user);
+        } catch (error) {
+            // Swallow errors and return null - user is not authenticated
+            return null;
+        }
+    }
+
+    /**
+     * Get the current session
+     */
+    async getSession(): Promise<AuthSession | null> {
+        try {
+            const { data, error } = await supabaseClient.auth.getSession();
+
+            if (error || !data.session) {
+                return null;
+            }
+
+            return mapSupabaseSessionToAuthSession(data.session);
+        } catch (error) {
+            // Swallow errors and return null - no active session
+            return null;
+        }
+    }
+
+    /**
+     * Subscribe to authentication state changes
+     * Returns an unsubscribe function
+     */
+    onAuthStateChange(callback: AuthStateChangeCallback): () => void {
+        const {
+            data: { subscription },
+        } = supabaseClient.auth.onAuthStateChange((event, session) => {
+            // Map Supabase events to our AuthEvent types
+            let authEvent: Parameters<AuthStateChangeCallback>[0];
+
+            switch (event) {
+                case 'SIGNED_IN':
+                    authEvent = 'SIGNED_IN';
+                    break;
+                case 'SIGNED_OUT':
+                    authEvent = 'SIGNED_OUT';
+                    break;
+                case 'USER_UPDATED':
+                    authEvent = 'USER_UPDATED';
+                    break;
+                case 'TOKEN_REFRESHED':
+                    authEvent = 'TOKEN_REFRESHED';
+                    break;
+                case 'PASSWORD_RECOVERY':
+                    authEvent = 'PASSWORD_RECOVERY';
+                    break;
+                default:
+                    // For other events, treat as USER_UPDATED
+                    authEvent = 'USER_UPDATED';
+            }
+
+            // Map session to our type or pass null
+            const mappedSession = session ? mapSupabaseSessionToAuthSession(session) : null;
+
+            // Call the callback with our mapped types
+            callback(authEvent, mappedSession);
+        });
+
+        // Return unsubscribe function
+        return () => {
+            subscription.unsubscribe();
+        };
+    }
+
+    // ============================================
+    // PASSWORD & PROFILE METHODS
+    // ============================================
+
+    /**
+     * Send password reset email
+     */
+    async resetPassword(email: string): Promise<PasswordResetResponse> {
+        try {
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window?.location?.origin || 'myapp://'}auth/reset-password`,
+            });
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to send reset email');
+            }
+
+            return {
+                success: true,
+                message: 'Password reset email sent successfully',
+            };
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to send reset email');
+        }
+    }
+
+    /**
+     * Update user password (requires current session)
+     */
+    async updatePassword(newPassword: string): Promise<void> {
+        try {
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword,
+            });
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to update password');
+            }
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to update password');
+        }
+    }
+
+    /**
+     * Update user profile information
+     */
+    async updateProfile(data: ProfileUpdateData): Promise<AuthUser> {
+        try {
+            const updateData: Record<string, any> = {};
+
+            // Email updates go directly to the user object
+            if (data.email) {
+                updateData.email = data.email;
+            }
+
+            // Profile fields go into user_metadata
+            if (data.name || data.avatarUrl) {
+                updateData.data = {
+                    name: data.name,
+                    avatar_url: data.avatarUrl,
+                };
+            }
+
+            const { data: userData, error } = await supabaseClient.auth.updateUser(updateData);
+
+            if (error) {
+                throw mapSupabaseErrorToAuthError(error, 'Failed to update profile');
+            }
+
+            if (!userData.user) {
+                throw new AuthError(
+                    AuthErrorCode.UNKNOWN_ERROR,
+                    'Profile update succeeded but no user returned'
+                );
+            }
+
+            return mapSupabaseUserToAuthUser(userData.user);
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to update profile');
+        }
+    }
+
+    // ============================================
+    // TOKEN MANAGEMENT
+    // ============================================
+
+    /**
+     * Refresh the current session token
+     */
+    async refreshSession(): Promise<AuthSession> {
+        try {
+            const { data, error } = await supabaseClient.auth.refreshSession();
+
+            if (error || !data.session) {
+                throw new AuthError(
+                    AuthErrorCode.SESSION_EXPIRED,
+                    'Failed to refresh session'
+                );
+            }
+
+            return mapSupabaseSessionToAuthSession(data.session);
+        } catch (error) {
+            if (error instanceof AuthError) {
+                throw error;
+            }
+            throw mapSupabaseErrorToAuthError(error, 'Failed to refresh session');
+        }
+    }
+
+    /**
+     * Verify if current session is valid
+     */
+    async isSessionValid(): Promise<boolean> {
+        try {
+            const session = await this.getSession();
+
+            if (!session) {
+                return false;
+            }
+
+            // Check if token is expired
+            const now = new Date();
+            if (session.expiresAt <= now) {
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+}

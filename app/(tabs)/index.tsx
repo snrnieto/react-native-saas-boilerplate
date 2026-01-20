@@ -1,21 +1,20 @@
 import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { View } from '@/components/Themed';
 
-import Head from 'expo-router/head';
 
 export default function TabOneScreen() {
   return (
     <View className='flex-1 items-center justify-center gap-4'>
-      <Head>
+      {/* <Head>
         <title>Tab One</title>
       </Head>
       <Text className="text-3xl font-bold !text-red-500 bg-red-300 p-10 rounded-full">
         Welcome to Nativewind!
       </Text>
       <Text className="text-2xl font-bold !text-green-600">Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
       <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );

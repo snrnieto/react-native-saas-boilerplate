@@ -10,7 +10,7 @@
 
 ## FASE 2: Capa de Abstracción y Auth (Seguridad)
 - [X] **Task 2.1:** Definir interfaz de TypeScript `IAuthService` en `/services/auth`.
-- [ ] **Task 2.2:** Implementar `SupabaseAuthAdapter` cumpliendo la interfaz `IAuthService`.
+- [X] **Task 2.2:** Implementar `SupabaseAuthAdapter` cumpliendo la interfaz `IAuthService`.
 - [ ] **Task 2.3:** Crear `AuthContext` y `AuthProvider` para inyectar el adapter de forma global.
 - [ ] **Task 2.4:** Configurar Layout de Expo Router para protección de rutas (Auth Guard: redirigir `/login` si no hay sesión).
 - [ ] **Task 2.5:** Crear pantallas básicas de Auth (Login, Sign Up) usando componentes de la librería elegida y Tailwind.

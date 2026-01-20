@@ -1,6 +1,10 @@
 /**
  * Auth Service Module
  * Barrel export for clean imports throughout the application
+ * 
+ * Implementation:
+ * - Default implementation: SupabaseAuthAdapter (see /src/adapters/supabase)
+ * - To use: import { SupabaseAuthAdapter } from '@/adapters/supabase'
  */
 
 // Main interface
