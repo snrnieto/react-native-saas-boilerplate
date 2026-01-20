@@ -6,10 +6,10 @@
 - [X] **Task 1.3:** Instalar y configurar librería de componentes (Gluestack/Tamagui) con el tema base.
 - [X] **Task 1.4:** Inicializar Prisma en la raíz, crear `schema.prisma` básico y configurar conexión a PostgreSQL (Supabase URL).
 - [X] **Task 1.5:** Crear estructura de directorios: `/src/core`, `/src/services`, `/src/adapters`, `/src/providers`, `/src/ui`, `/src/store`.
-- [ ] **Task 1.6:** Configurar variables de entorno (.env) para Web y Mobile.
+- [X] **Task 1.6:** Configurar variables de entorno (.env) para Web y Mobile.
 
 ## FASE 2: Capa de Abstracción y Auth (Seguridad)
-- [ ] **Task 2.1:** Definir interfaz de TypeScript `IAuthService` en `/services/auth`.
+- [X] **Task 2.1:** Definir interfaz de TypeScript `IAuthService` en `/services/auth`.
 - [ ] **Task 2.2:** Implementar `SupabaseAuthAdapter` cumpliendo la interfaz `IAuthService`.
 - [ ] **Task 2.3:** Crear `AuthContext` y `AuthProvider` para inyectar el adapter de forma global.
 - [ ] **Task 2.4:** Configurar Layout de Expo Router para protección de rutas (Auth Guard: redirigir `/login` si no hay sesión).
