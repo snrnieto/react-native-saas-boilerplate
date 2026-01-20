@@ -1,11 +1,11 @@
 # 📋 SaaS Boilerplate Backlog (Jira Ready)
 
 ## FASE 1: Infraestructura y Skeleton (Setup)
-- [ ] **Task 1.1:** Inicializar proyecto Expo (SDK más reciente) con template `tabs` de Expo Router.
-- [ ] **Task 1.2:** Configurar NativeWind (Tailwind CSS) y configurar soporte para Web, Android e iOS.
-- [ ] **Task 1.3:** Instalar y configurar librería de componentes (Gluestack/Tamagui) con el tema base.
-- [ ] **Task 1.4:** Inicializar Prisma en la raíz, crear `schema.prisma` básico y configurar conexión a PostgreSQL (Supabase URL).
-- [ ] **Task 1.5:** Crear estructura de directorios: `/src/core`, `/src/services`, `/src/adapters`, `/src/providers`, `/src/ui`, `/src/store`.
+- [X] **Task 1.1:** Inicializar proyecto Expo (SDK más reciente) con template `tabs` de Expo Router.
+- [X] **Task 1.2:** Configurar NativeWind (Tailwind CSS) y configurar soporte para Web, Android e iOS.
+- [X] **Task 1.3:** Instalar y configurar librería de componentes (Gluestack/Tamagui) con el tema base.
+- [X] **Task 1.4:** Inicializar Prisma en la raíz, crear `schema.prisma` básico y configurar conexión a PostgreSQL (Supabase URL).
+- [X] **Task 1.5:** Crear estructura de directorios: `/src/core`, `/src/services`, `/src/adapters`, `/src/providers`, `/src/ui`, `/src/store`.
 - [ ] **Task 1.6:** Configurar variables de entorno (.env) para Web y Mobile.
 
 ## FASE 2: Capa de Abstracción y Auth (Seguridad)
