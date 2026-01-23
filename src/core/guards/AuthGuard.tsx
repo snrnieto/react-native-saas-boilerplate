@@ -12,10 +12,10 @@
  * ```
  */
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSegments, usePathname, Redirect } from 'expo-router';
-import { View, ActivityIndicator, Text } from 'react-native';
 import { useAuth } from '@/src/providers/auth';
+import { usePathname, useRouter, useSegments } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 export interface AuthGuardProps {
     children: React.ReactNode;
@@ -57,23 +57,23 @@ export function AuthGuard({
             const cleanPath = pathname.replace(/^\//, '').split('/')[0];
             return cleanPath || 'index';
         }
-        
+
         // Fallback to segments
         if (segments && segments.length > 0) {
             const lastSegment = segments[segments.length - 1];
             // Remove parentheses from route groups like "(tabs)"
             return lastSegment.replace(/[()]/g, '') || 'index';
         }
-        
+
         return 'index';
     };
 
     const currentRoute = getCurrentRoute();
     const routePath = pathname || segments.join('/') || '';
     const isPublicRoute = publicRoutes.some(route => {
-        const routeMatch = routePath.includes(route) || 
-                          currentRoute === route ||
-                          segments.some(seg => seg.includes(route));
+        const routeMatch = routePath.includes(route) ||
+            currentRoute === route ||
+            segments.some(seg => seg.includes(route));
         return routeMatch;
     });
 
@@ -128,7 +128,7 @@ export function AuthGuard({
         }
 
         // Reset redirect flag if we're on a valid route
-        if ((isAuthenticated && !routePath.includes('login')) || 
+        if ((isAuthenticated && !routePath.includes('login')) ||
             (!isAuthenticated && isPublicRoute)) {
             setHasRedirected(false);
         }
