@@ -10,12 +10,15 @@ import '../global.css';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProviders } from '@/src/providers';
+import { AuthGuard } from '@/src/core/guards';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary
 } from 'expo-router';
 
+// Note: initialRouteName is set dynamically in RootLayoutNav based on auth state
+// This prevents issues on mobile where the router might initialize before auth is ready
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
@@ -55,10 +58,19 @@ function RootLayoutNav() {
     <SafeAreaProvider>
       <AppProviders>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          </Stack>
+          <AuthGuard>
+            <Stack>
+              <Stack.Screen 
+                name="login" 
+                options={{ 
+                  headerShown: false,
+                  presentation: 'modal',
+                }} 
+              />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            </Stack>
+          </AuthGuard>
         </ThemeProvider>
       </AppProviders>
     </SafeAreaProvider>
