@@ -6,3 +6,5 @@
 export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
 export { Input, type InputProps, type InputSize, type InputState } from './Input';
 export { Card, type CardProps, type CardVariant } from './Card';
+export { Modal, type ModalProps } from './Modal';
+export { ConfirmDialog, type ConfirmDialogProps } from './Modal/ConfirmDialog';

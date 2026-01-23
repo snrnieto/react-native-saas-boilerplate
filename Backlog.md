@@ -13,7 +13,7 @@
 - [X] **Task 2.2:** Implementar `SupabaseAuthAdapter` cumpliendo la interfaz `IAuthService`.
 - [X] **Task 2.3:** Crear `AuthContext` y `AuthProvider` para inyectar el adapter de forma global.
 - [X] **Task 2.4:** Configurar Layout de Expo Router para protección de rutas (Auth Guard: redirigir `/login` si no hay sesión).
-- [ ] **Task 2.5:** Crear pantallas básicas de Auth (Login, Sign Up) usando componentes de la librería elegida y Tailwind.
+- [X] **Task 2.5:** Crear pantallas básicas de Auth (Login, Sign Up) usando componentes de la librería elegida y Tailwind.
 
 ## FASE 3: Lógica de Negocio y Estado (Core)
 - [ ] **Task 3.1:** Crear Store global con **Zustand** para la lógica del contador.

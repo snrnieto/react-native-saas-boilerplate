@@ -8,9 +8,9 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AppProviders } from '@/src/providers';
 import { AuthGuard } from '@/src/core/guards';
+import { AppProviders } from '@/src/providers';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,12 +60,19 @@ function RootLayoutNav() {
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <AuthGuard>
             <Stack>
-              <Stack.Screen 
-                name="login" 
-                options={{ 
+              <Stack.Screen
+                name="login"
+                options={{
                   headerShown: false,
                   presentation: 'modal',
-                }} 
+                }}
+              />
+              <Stack.Screen
+                name="signup"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                }}
               />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

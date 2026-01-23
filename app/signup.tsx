@@ -1,7 +1,7 @@
 /**
- * Login Screen
+ * Sign Up Screen
  * 
- * Pantalla de inicio de sesión usando los componentes del sistema de diseño.
+ * Pantalla de registro usando los componentes del sistema de diseño.
  */
 
 import { useAuth } from '@/src/providers/auth';
@@ -11,16 +11,34 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 
-export default function LoginScreen() {
-    const { signIn, isLoading } = useAuth();
+export default function SignUpScreen() {
+    const { signUp, isLoading } = useAuth();
     const { theme } = useTheme();
     const router = useRouter();
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errors, setErrors] = useState<{
+        name?: string;
+        email?: string;
+        password?: string;
+        confirmPassword?: string;
+    }>({});
 
     const validateForm = (): boolean => {
-        const newErrors: { email?: string; password?: string } = {};
+        const newErrors: {
+            name?: string;
+            email?: string;
+            password?: string;
+            confirmPassword?: string;
+        } = {};
+
+        if (!name.trim()) {
+            newErrors.name = 'Name is required';
+        } else if (name.trim().length < 2) {
+            newErrors.name = 'Name must be at least 2 characters';
+        }
 
         if (!email.trim()) {
             newErrors.email = 'Email is required';
@@ -34,23 +52,31 @@ export default function LoginScreen() {
             newErrors.password = 'Password must be at least 6 characters';
         }
 
+        if (!confirmPassword) {
+            newErrors.confirmPassword = 'Please confirm your password';
+        } else if (password !== confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleLogin = async () => {
+    const handleSignUp = async () => {
         if (!validateForm()) {
             return;
         }
 
         try {
-            await signIn(email.trim(), password);
+            await signUp(email.trim(), password, {
+                name: name.trim(),
+            });
             // Navigation will be handled automatically by AuthGuard
             router.replace('/(tabs)');
         } catch (error: any) {
             Alert.alert(
-                'Login Failed',
-                error?.message || 'Invalid email or password. Please try again.',
+                'Sign Up Failed',
+                error?.message || 'Unable to create account. Please try again.',
                 [{ text: 'OK' }]
             );
         }
@@ -92,7 +118,7 @@ export default function LoginScreen() {
                                 textAlign: 'center',
                             }}
                         >
-                            Welcome Back
+                            Create Account
                         </Text>
                         <Text
                             style={{
@@ -101,13 +127,34 @@ export default function LoginScreen() {
                                 textAlign: 'center',
                             }}
                         >
-                            Sign in to continue
+                            Sign up to get started
                         </Text>
                     </View>
 
-                    {/* Login Form */}
+                    {/* Sign Up Form */}
                     <Card padding="lg">
                         <View style={{ gap: spacing.md }}>
+                            <Input
+                                label="Full Name"
+                                placeholder="Enter your full name"
+                                value={name}
+                                onChangeText={(text) => {
+                                    setName(text);
+                                    if (errors.name) {
+                                        setErrors((prev) => ({ ...prev, name: undefined }));
+                                    }
+                                }}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                autoComplete="name"
+                                textContentType="name"
+                                importantForAutofill="yes"
+                                error={!!errors.name}
+                                errorMessage={errors.name}
+                                size="md"
+                                fullWidth
+                            />
+
                             <Input
                                 label="Email"
                                 placeholder="Enter your email"
@@ -120,10 +167,8 @@ export default function LoginScreen() {
                                 }}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
-                                autoCorrect={false}
                                 autoComplete="email"
                                 textContentType="emailAddress"
-                                importantForAutofill="yes"
                                 error={!!errors.email}
                                 errorMessage={errors.email}
                                 size="md"
@@ -132,7 +177,7 @@ export default function LoginScreen() {
 
                             <Input
                                 label="Password"
-                                placeholder="Enter your password"
+                                placeholder="Create a password"
                                 value={password}
                                 onChangeText={(text) => {
                                     setPassword(text);
@@ -143,11 +188,33 @@ export default function LoginScreen() {
                                 secureTextEntry
                                 autoCapitalize="none"
                                 autoCorrect={false}
-                                autoComplete="password"
-                                textContentType="password"
+                                autoComplete="password-new"
+                                textContentType="newPassword"
                                 importantForAutofill="yes"
                                 error={!!errors.password}
                                 errorMessage={errors.password}
+                                size="md"
+                                fullWidth
+                            />
+
+                            <Input
+                                label="Confirm Password"
+                                placeholder="Confirm your password"
+                                value={confirmPassword}
+                                onChangeText={(text) => {
+                                    setConfirmPassword(text);
+                                    if (errors.confirmPassword) {
+                                        setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                                    }
+                                }}
+                                secureTextEntry
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                autoComplete="password-new"
+                                textContentType="newPassword"
+                                importantForAutofill="yes"
+                                error={!!errors.confirmPassword}
+                                errorMessage={errors.confirmPassword}
                                 size="md"
                                 fullWidth
                             />
@@ -158,15 +225,15 @@ export default function LoginScreen() {
                                     size="lg"
                                     fullWidth
                                     loading={isLoading}
-                                    onPress={handleLogin}
+                                    onPress={handleSignUp}
                                 >
-                                    Sign In
+                                    Create Account
                                 </Button>
                             </View>
                         </View>
                     </Card>
 
-                    {/* Sign Up Link */}
+                    {/* Login Link */}
                     <View
                         style={{
                             flexDirection: 'row',
@@ -182,9 +249,9 @@ export default function LoginScreen() {
                                 color: colors.text.secondary,
                             }}
                         >
-                            Don't have an account?
+                            Already have an account?
                         </Text>
-                        <Pressable onPress={() => router.push('/signup' as any)}>
+                        <Pressable onPress={() => router.push('/login' as any)}>
                             <Text
                                 style={{
                                     fontSize: typography.fontSize.base,
@@ -192,7 +259,7 @@ export default function LoginScreen() {
                                     color: colors.primary,
                                 }}
                             >
-                                Sign Up
+                                Sign In
                             </Text>
                         </Pressable>
                     </View>
