@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
+const path = require("path");
 
 const config = getDefaultConfig(__dirname);
 
@@ -7,6 +8,17 @@ const config = getDefaultConfig(__dirname);
 config.transformer = {
   ...config.transformer,
   unstable_allowRequireContext: true,
+};
+
+// Resolve React as a singleton to avoid multiple instances
+// This fixes "React.default.createContext is not a function" in web builds
+// This is a known issue with React 19 and Expo SDK 54 on web
+config.resolver = {
+  ...config.resolver,
+  extraNodeModules: {
+    react: path.resolve(__dirname, "node_modules/react"),
+    "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+  },
 };
 
 // Ensure hot reloading works

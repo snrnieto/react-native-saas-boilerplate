@@ -7,7 +7,7 @@
  * Integrado con useColorScheme de Expo para detectar el tema del sistema.
  */
 
-import React, { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
 import { useColorScheme as useExpoColorScheme } from '@/components/useColorScheme';
 import type { Theme, ThemeMode } from './themes';
 import { getTheme, themes } from './themes';
