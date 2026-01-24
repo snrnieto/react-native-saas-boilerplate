@@ -11,6 +11,8 @@
     "clean": "expo prebuild --clean",
     "build:android:debug": "expo run:android --variant debug",
     "build:android:release": "expo run:android --variant release",
+    "build:ios:debug": "expo run:ios --configuration Debug",
+    "build:ios:release": "expo run:ios --configuration Release",
     "build:web": "expo export --platform web",
     "build:web:debug": "expo export --platform web --no-minify",
     "preview:web": "npx serve dist",
