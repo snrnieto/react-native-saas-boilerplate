@@ -17,6 +17,8 @@ export default function HomeScreen() {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [signOutLoading, setSignOutLoading] = useState(false);
 
+  console.log({ user, session });
+
   const handleSignOut = () => {
     console.log('handleSignOut');
     setShowSignOutDialog(true);
@@ -39,7 +41,7 @@ export default function HomeScreen() {
     setShowSignOutDialog(false);
   };
 
-  const formatDate = (date: Date | null | undefined): string => {
+  const formatDate = (date: string | null | undefined): string => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',

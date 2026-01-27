@@ -12,31 +12,31 @@ import { AuthError, AuthErrorCode } from '../../services/auth/types';
 /**
  * Maps Supabase User to our AuthUser type
  * @param supabaseUser - Supabase user object
- * @returns AuthUser - Our application's user type
+ * @returns AuthUser - Our application's user type with ISO 8601 date strings
  */
 export function mapSupabaseUserToAuthUser(supabaseUser: SupabaseUser): AuthUser {
     return {
         id: supabaseUser.id,
         email: supabaseUser.email || '',
-        emailVerified: supabaseUser.email_confirmed_at ? new Date(supabaseUser.email_confirmed_at) : null,
+        emailVerified: supabaseUser.email_confirmed_at || null,
         name: supabaseUser.user_metadata?.name || null,
         avatarUrl: supabaseUser.user_metadata?.avatar_url || null,
-        createdAt: new Date(supabaseUser.created_at),
-        updatedAt: new Date(supabaseUser.updated_at || supabaseUser.created_at),
+        createdAt: supabaseUser.created_at,
+        updatedAt: supabaseUser.updated_at || supabaseUser.created_at,
     };
 }
 
 /**
  * Maps Supabase Session to our AuthSession type
  * @param supabaseSession - Supabase session object
- * @returns AuthSession - Our application's session type
+ * @returns AuthSession - Our application's session type with ISO 8601 date strings
  */
 export function mapSupabaseSessionToAuthSession(supabaseSession: SupabaseSession): AuthSession {
     return {
         id: supabaseSession.user.id, // Using user ID as session ID
         userId: supabaseSession.user.id,
         token: supabaseSession.access_token,
-        expiresAt: new Date(supabaseSession.expires_at! * 1000), // Convert Unix timestamp to Date
+        expiresAt: new Date(supabaseSession.expires_at! * 1000).toISOString(), // Convert Unix timestamp to ISO 8601 string
         user: mapSupabaseUserToAuthUser(supabaseSession.user),
     };
 }
@@ -63,7 +63,7 @@ export function mapSupabaseErrorToAuthError(
 
     // Map Supabase error messages/codes to our AuthErrorCode enum
     // Based on common Supabase Auth error patterns
-    
+
     // Sign In Errors
     if (errorMessage.toLowerCase().includes('invalid login credentials') ||
         errorMessage.toLowerCase().includes('invalid email or password')) {
@@ -84,10 +84,10 @@ export function mapSupabaseErrorToAuthError(
         return new AuthError(AuthErrorCode.EMAIL_ALREADY_EXISTS, errorMessage, error);
     }
 
-    if (errorMessage.toLowerCase().includes('password') && 
-        (errorMessage.toLowerCase().includes('weak') || 
-         errorMessage.toLowerCase().includes('short') ||
-         errorMessage.toLowerCase().includes('at least'))) {
+    if (errorMessage.toLowerCase().includes('password') &&
+        (errorMessage.toLowerCase().includes('weak') ||
+            errorMessage.toLowerCase().includes('short') ||
+            errorMessage.toLowerCase().includes('at least'))) {
         return new AuthError(AuthErrorCode.WEAK_PASSWORD, errorMessage, error);
     }
 

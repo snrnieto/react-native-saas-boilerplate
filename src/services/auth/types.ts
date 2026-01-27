@@ -1,6 +1,9 @@
 /**
  * Core authentication types for the SaaS boilerplate.
- * These types are provider-agnostic and based on Prisma schema models.
+ * These types match the Supabase Auth structure.
+ * 
+ * NOTE: Dates are serialized as ISO 8601 strings when coming from Supabase,
+ * and should be converted to Date objects by the adapter when needed.
  */
 
 // ============================================
@@ -8,47 +11,31 @@
 // ============================================
 
 /**
- * Authenticated user representation (client-side)
- * Based on Prisma User model but simplified for frontend use
+ * Authenticated user representation
+ * Matches Supabase auth.users structure + user_metadata
  */
 export interface AuthUser {
     id: string;
     email: string;
-    emailVerified: Date | null;
+    emailVerified: string | null; // ISO 8601 datetime string from Supabase
     name: string | null;
     avatarUrl: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string; // ISO 8601 datetime string from Supabase
+    updatedAt: string; // ISO 8601 datetime string from Supabase
 }
 
 /**
  * User session information
- * Based on Prisma Session model
+ * Matches Supabase Session structure
  */
 export interface AuthSession {
     id: string;
     userId: string;
-    token: string;
-    expiresAt: Date;
+    token: string; // JWT access token
+    expiresAt: string; // ISO 8601 datetime string
     user?: AuthUser;
 }
 
-/**
- * User metadata for registration
- */
-export interface UserMetadata {
-    name?: string;
-    avatarUrl?: string;
-}
-
-/**
- * Profile update data
- */
-export interface ProfileUpdateData {
-    name?: string;
-    avatarUrl?: string;
-    email?: string;
-}
 
 // ============================================
 // OAUTH TYPES
@@ -61,7 +48,6 @@ export type OAuthProvider = 'google' | 'apple' | 'github' | 'facebook';
 
 /**
  * OAuth account information
- * Based on Prisma Account model
  */
 export interface OAuthAccount {
     id: string;
@@ -70,7 +56,7 @@ export interface OAuthAccount {
     providerAccountId: string;
     accessToken: string | null;
     refreshToken: string | null;
-    expiresAt: Date | null;
+    expiresAt: string | null;
     tokenType: string | null;
     scope: string | null;
 }
