@@ -36,6 +36,25 @@ export interface AuthSession {
     user?: AuthUser;
 }
 
+/**
+ * User metadata for registration
+ */
+export interface UserMetadata {
+    name?: string;
+    avatarUrl?: string;
+}
+
+/**
+ * Profile update data (for auth metadata only)
+ * For extended profile data, use Profile service
+ */
+export interface ProfileUpdateData {
+    name?: string;
+    avatarUrl?: string;
+    email?: string;
+}
+
+
 
 // ============================================
 // OAUTH TYPES

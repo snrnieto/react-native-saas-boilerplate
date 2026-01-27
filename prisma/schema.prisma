@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DIRECT_URL")
 }
 
 // ============================================
@@ -16,17 +17,29 @@ datasource db {
 // User authentication and session management are handled by Supabase's auth schema.
 // No custom User or Session tables are needed.
 // 
-// Add your business logic models below (e.g., Subscription, Product, etc.)
-// and reference Supabase auth users via their UUID.
-//
-// Example:
-// model Subscription {
-//   id        String   @id @default(uuid()) @db.Uuid
-//   userId    String   @map("user_id") @db.Uuid  // References auth.users(id) in Supabase
-//   plan      String
-//   status    String
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-//   
-//   @@map("subscriptions")
-// }
+// Business logic models reference Supabase auth users via their UUID.
+
+// ============================================
+// USER PROFILE
+// ============================================
+
+/// Extended user profile information
+/// References auth.users(id) from Supabase Auth
+model Profile {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String @unique @map("user_id") @db.Uuid // References auth.users(id) in Supabase
+
+  // Profile fields
+  bio       String? @db.Text
+  phone     String?
+  avatarUrl String? @map("avatar_url")
+
+  // User preferences stored as JSON
+  preferences Json? @db.JsonB
+
+  // Metadata
+  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
+  updatedAt DateTime @default(dbgenerated("now()")) @map("updated_at")
+
+  @@map("profiles")
+}

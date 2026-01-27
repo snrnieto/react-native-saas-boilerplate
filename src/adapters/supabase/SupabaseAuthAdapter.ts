@@ -67,6 +67,29 @@ export class SupabaseAuthAdapter implements IAuthService {
                 );
             }
 
+            // Create profile in the profiles table
+            try {
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert({
+                        user_id: data.user.id,
+                        avatar_url: metadata?.avatarUrl || null,
+                        bio: null,
+                        phone: null,
+                        preferences: null,
+                    });
+
+                if (profileError) {
+                    console.error('Failed to create profile:', profileError);
+                    // Don't throw - profile creation is not critical for signup success
+                    // The profile can be created later if needed
+                }
+            } catch (profileError) {
+                console.error('Error creating profile:', profileError);
+                // Don't throw - allow signup to succeed even if profile creation fails
+            }
+
+
             return {
                 user: mapSupabaseUserToAuthUser(data.user),
                 session: mapSupabaseSessionToAuthSession(data.session),
@@ -388,7 +411,8 @@ export class SupabaseAuthAdapter implements IAuthService {
 
             // Check if token is expired
             const now = new Date();
-            if (session.expiresAt <= now) {
+            const expiresAt = new Date(session.expiresAt);
+            if (expiresAt <= now) {
                 return false;
             }
 
