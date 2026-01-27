@@ -11,9 +11,11 @@
  */
 
 import { useMemo, type ReactNode } from 'react';
-import { AuthProvider } from './auth';
 import { SupabaseAuthAdapter } from '../adapters/supabase';
+import { ToastProvider } from '../ui/components/Toast/ToastContext';
 import { ThemeProvider } from '../ui/ThemeProvider';
+import { AuthProvider } from './auth';
+import { ProfileProvider } from './profile/ProfileContext';
 
 // TODO: Future adapters can be imported here
 // import { FirebaseAuthAdapter } from '../adapters/firebase';
@@ -71,16 +73,11 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <ThemeProvider>
             <AuthProvider authService={authService}>
-                {/* TODO: Add more providers here as needed */}
-                {/* 
-                <BillingProvider billingService={billingService}>
-                <AnalyticsProvider analyticsService={analyticsService}>
-                */}
-                {children}
-                {/* 
-                </AnalyticsProvider>
-                </BillingProvider>
-                */}
+                <ProfileProvider>
+                    <ToastProvider>
+                        {children}
+                    </ToastProvider>
+                </ProfileProvider>
             </AuthProvider>
         </ThemeProvider>
     );

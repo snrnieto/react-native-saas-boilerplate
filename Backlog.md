@@ -16,10 +16,10 @@
 - [X] **Task 2.5:** Crear pantallas básicas de Auth (Login, Sign Up) usando componentes de la librería elegida y Tailwind.
 
 ## FASE 3: Lógica de Negocio y Estado (Core)
-- [ ] **Task 3.1:** Crear Store global con **Zustand** para la lógica del contador.
-- [ ] **Task 3.2:** Diseñar UI de la pantalla principal `(app)/index.tsx` que consuma el Store del contador.
-- [ ] **Task 3.3:** Implementar persistencia básica del contador vinculada al ID del usuario autenticado.
-- [ ] **Task 3.4:** Crear hook de negocio `useCounter` en `/src/core/hooks` para separar lógica de UI.
+- [X] **Task 3.1:** Crear Store global con **Zustand** para la lógica del contador.
+- [X] **Task 3.2:** Diseñar UI de la pantalla principal `(app)/index.tsx` que consuma el Store del contador.
+- [X] **Task 3.3:** Implementar persistencia básica del contador vinculada al ID del usuario autenticado.
+- [X] **Task 3.4:** Crear hook de negocio `useCounter` en `/src/core/hooks` para separar lógica de UI.
 
 ## FASE 4: Sistema de Pagos Híbrido (Monetización)
 - [ ] **Task 4.1:** Definir interfaz de TypeScript `IBillingService` en `/services/billing`.

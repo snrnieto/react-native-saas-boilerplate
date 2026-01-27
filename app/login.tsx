@@ -7,14 +7,16 @@
 import { useAuth } from '@/src/providers/auth';
 import { useTheme } from '@/src/ui/ThemeProvider';
 import { Button, Card, Input } from '@/src/ui/components';
+import { useToast } from '@/src/ui/components/Toast/ToastContext';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 
 export default function LoginScreen() {
     const { signIn, isLoading } = useAuth();
     const { theme } = useTheme();
     const router = useRouter();
+    const { showError } = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -48,10 +50,9 @@ export default function LoginScreen() {
             // Navigation will be handled automatically by AuthGuard
             router.replace('/(tabs)');
         } catch (error: any) {
-            Alert.alert(
-                'Login Failed',
+            showError(
                 error?.message || 'Invalid email or password. Please try again.',
-                [{ text: 'OK' }]
+                { position: 'bottom' }
             );
         }
     };

@@ -9,8 +9,12 @@ import '../global.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthGuard } from '@/src/core/guards';
+import initI18n from '@/src/i18n';
 import { AppProviders } from '@/src/providers';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+// Initialize i18n
+initI18n();
 
 export {
   // Catch any errors thrown by the Layout component.
