@@ -41,7 +41,7 @@ export interface AuthGuardProps {
  */
 export function AuthGuard({
     children,
-    publicRoutes = ['login', 'signup', 'reset-password'],
+    publicRoutes = ['login', 'signup', 'reset-password', 'forgot-password'],
     redirectTo = '/login',
 }: AuthGuardProps) {
     const { isAuthenticated, isLoading } = useAuth();

@@ -6,6 +6,14 @@ export interface IAuthTranslations {
     emailPlaceholder: string;
     passwordPlaceholder: string;
     loading: string;
+    forgotPassword: string;
+    resetPassword: string;
+    resetPasswordTitle: string;
+    resetPasswordDescription: string;
+    resetPasswordSuccess: string;
+    resetPasswordSuccessMessage: string;
+    backToLogin: string;
+    rememberPassword: string;
     error: {
         invalidEmail: string;
         weakPassword: string;
