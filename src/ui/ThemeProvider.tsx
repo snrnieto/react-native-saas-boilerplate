@@ -7,10 +7,10 @@
  * Integrado con useColorScheme de Expo para detectar el tema del sistema.
  */
 
-import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
 import { useColorScheme as useExpoColorScheme } from '@/components/useColorScheme';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Theme, ThemeMode } from './themes';
-import { getTheme, themes } from './themes';
+import { getTheme } from './themes';
 
 // ============================================
 // CONTEXT
@@ -57,18 +57,20 @@ export function ThemeProvider({
     if (initialMode) {
       return initialMode;
     }
+    // Handle case where systemColorScheme might be null/undefined on mobile
+    // Default to 'light' if systemColorScheme is not available
     return systemColorScheme === 'dark' ? 'dark' : 'light';
   });
 
   // Update mode when system theme changes (if followSystem is true)
   useEffect(() => {
-    if (followSystem && !initialMode) {
+    if (followSystem && !initialMode && systemColorScheme) {
       const systemMode = systemColorScheme === 'dark' ? 'dark' : 'light';
       setModeState(systemMode);
     }
   }, [systemColorScheme, followSystem, initialMode]);
 
-  // Get current theme
+  // Get current theme - ensure we always have a valid theme
   const theme = useMemo(() => getTheme(mode), [mode]);
 
   // Set mode function

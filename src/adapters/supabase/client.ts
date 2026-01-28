@@ -15,6 +15,7 @@ import { AppState, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, processLock, SupabaseClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
+import type { GoTrueClientOptions } from "@supabase/auth-js";
 
 // Get Supabase configuration from environment variables
 const SUPABASE_URL =
@@ -50,7 +51,10 @@ export const supabaseClient: SupabaseClient = createClient(
             persistSession: true,
             detectSessionInUrl: Platform.OS === 'web',
             lock: processLock,
-        },
+            // Avoid "Lock acquisition timed out after 0ms" when multiple auth ops run.
+            // Supported by @supabase/auth-js; supabase-js typings don't expose it yet.
+            lockAcquireTimeout: 10_000,
+        } as GoTrueClientOptions,
     }
 );
 

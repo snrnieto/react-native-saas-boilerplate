@@ -17,6 +17,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { AuthGuard } from "@/src/core/guards";
 import initI18n from "@/src/i18n";
 import { AppProviders } from "@/src/providers";
+import { ThemeProvider as CustomThemeProvider } from "@/src/ui/ThemeProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Initialize i18n
@@ -24,7 +25,7 @@ initI18n();
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from "expo-router";
 
 // Note: initialRouteName is set dynamically in RootLayoutNav based on auth state
@@ -68,39 +69,41 @@ function RootLayoutNav() {
 
   return (
     <SafeAreaProvider>
-      <AppProviders>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <AuthGuard>
-            <Stack>
-              <Stack.Screen
-                name="login"
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="signup"
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="forgot-password"
-                options={{
-                  title: t("auth.resetPasswordTitle"),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-            </Stack>
-          </AuthGuard>
-        </ThemeProvider>
-      </AppProviders>
+      <CustomThemeProvider>
+        <AppProviders>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <AuthGuard>
+              <Stack>
+                <Stack.Screen
+                  name="login"
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="signup"
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="forgot-password"
+                  options={{
+                    title: t("auth.resetPasswordTitle"),
+                    headerShown: true,
+                  }}
+                />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+              </Stack>
+            </AuthGuard>
+          </ThemeProvider>
+        </AppProviders>
+      </CustomThemeProvider>
     </SafeAreaProvider>
   );
 }

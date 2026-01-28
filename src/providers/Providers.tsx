@@ -13,7 +13,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { SupabaseAuthAdapter, SupabaseProfileAdapter } from '../adapters/supabase';
 import { ToastProvider } from '../ui/components/Toast/ToastContext';
-import { ThemeProvider } from '../ui/ThemeProvider';
 import { AuthProvider } from './auth';
 import { ProfileProvider } from './profile/ProfileContext';
 
@@ -73,14 +72,12 @@ export function AppProviders({ children }: ProvidersProps) {
     // Order matters: inner providers can depend on outer providers
 
     return (
-        <ThemeProvider>
-            <AuthProvider authService={authService}>
-                <ProfileProvider profileService={profileService}>
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
-                </ProfileProvider>
-            </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider authService={authService}>
+            <ProfileProvider profileService={profileService}>
+                <ToastProvider>
+                    {children}
+                </ToastProvider>
+            </ProfileProvider>
+        </AuthProvider>
     );
 }
