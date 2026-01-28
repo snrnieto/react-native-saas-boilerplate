@@ -1,21 +1,31 @@
 /**
  * Supabase Client Configuration
- * 
+ *
  * Singleton instance of the Supabase client used throughout the auth adapter.
  * Configured for Expo with proper environment variables.
+ *
+ * Session persistence:
+ * - Web: localStorage (default). Session survives reload.
+ * - Mobile: AsyncStorage. Session survives app close/restart.
+ * When session expires or refresh fails, Supabase emits SIGNED_OUT and AuthGuard redirects to login.
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import 'react-native-url-polyfill/auto';
+import { AppState, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient, processLock, SupabaseClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 
 // Get Supabase configuration from environment variables
-const SUPABASE_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL 
-    || process.env.EXPO_PUBLIC_SUPABASE_URL 
-    || '';
+const SUPABASE_URL =
+    Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL ||
+    process.env.EXPO_PUBLIC_SUPABASE_URL ||
+    '';
 
-const SUPABASE_ANON_KEY = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_ANON_KEY 
-    || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY 
-    || '';
+const SUPABASE_ANON_KEY =
+    Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
+    '';
 
 // Validate required environment variables
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -25,25 +35,34 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 
 /**
  * Singleton Supabase client instance
- * Configured with:
- * - Auto token refresh
- * - Persistent sessions (using AsyncStorage on mobile, localStorage on web)
- * - Auth state change detection
+ * - persistSession: true — session stored in AsyncStorage (native) / localStorage (web)
+ * - autoRefreshToken: true — tokens refreshed before expiry
+ * - storage (native only): AsyncStorage so session survives app close
+ * - AppState (native only): start/stop auto-refresh when app goes foreground/background
  */
 export const supabaseClient: SupabaseClient = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
         auth: {
-            // Storage is automatically handled by Supabase:
-            // - Web: localStorage
-            // - React Native: AsyncStorage (auto-detected)
+            ...(Platform.OS !== 'web' ? { storage: AsyncStorage } : {}),
             autoRefreshToken: true,
             persistSession: true,
-            detectSessionInUrl: true, // Useful for OAuth redirects on web
+            detectSessionInUrl: Platform.OS === 'web',
+            lock: processLock,
         },
     }
 );
+
+if (Platform.OS !== 'web') {
+    AppState.addEventListener('change', (state) => {
+        if (state === 'active') {
+            supabaseClient.auth.startAutoRefresh();
+        } else {
+            supabaseClient.auth.stopAutoRefresh();
+        }
+    });
+}
 
 /**
  * Helper to check if Supabase is properly configured

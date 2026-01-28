@@ -1,11 +1,12 @@
 /**
  * ProfileContext
- * 
+ *
  * Provides access to user profile data (bio, phone, etc.) separately from auth.
+ * Profile service is injected (e.g. SupabaseProfileAdapter) to keep the provider
+ * adapter-agnostic.
  */
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { SupabaseProfileAdapter } from '../../adapters/supabase/SupabaseProfileAdapter';
 import type { IProfileService } from '../../services/profile/IProfileService';
 import type { Profile, ProfileUpdateData } from '../../services/profile/types';
 import { useAuth } from '../auth';
@@ -20,11 +21,12 @@ interface ProfileContextValue {
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
 
-// Instantiate adapter once
-// In a real DI system, this would be injected
-const profileService: IProfileService = new SupabaseProfileAdapter();
+export interface ProfileProviderProps {
+    profileService: IProfileService;
+    children: ReactNode;
+}
 
-export function ProfileProvider({ children }: { children: ReactNode }) {
+export function ProfileProvider({ profileService, children }: ProfileProviderProps) {
     const { user } = useAuth();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -67,7 +69,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         return () => {
             isMounted = false;
         };
-    }, [user]);
+    }, [user, profileService]);
 
     const updateProfile = async (data: ProfileUpdateData): Promise<Profile | null> => {
         if (!user) return null;

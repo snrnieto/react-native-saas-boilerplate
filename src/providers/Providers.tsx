@@ -11,7 +11,7 @@
  */
 
 import { useMemo, type ReactNode } from 'react';
-import { SupabaseAuthAdapter } from '../adapters/supabase';
+import { SupabaseAuthAdapter, SupabaseProfileAdapter } from '../adapters/supabase';
 import { ToastProvider } from '../ui/components/Toast/ToastContext';
 import { ThemeProvider } from '../ui/ThemeProvider';
 import { AuthProvider } from './auth';
@@ -31,8 +31,9 @@ export interface ProvidersProps {
  * Centralizes all provider integrations for the application.
  * 
  * Current Integrations:
- * - AuthProvider: Authentication service (currently using SupabaseAuthAdapter)
- * 
+ * - AuthProvider: Authentication (SupabaseAuthAdapter, injected)
+ * - ProfileProvider: Profile data (SupabaseProfileAdapter, injected)
+ *
  * To add a new provider:
  * 1. Import the provider component
  * 2. Import/create the adapter/service instance
@@ -58,6 +59,7 @@ export function AppProviders({ children }: ProvidersProps) {
      * const authService = useMemo(() => new FirebaseAuthAdapter(), []);
      */
     const authService = useMemo(() => new SupabaseAuthAdapter(), []);
+    const profileService = useMemo(() => new SupabaseProfileAdapter(), []);
 
     // TODO: Future adapter instantiations
     // const billingService = useMemo(() => new PaddleAdapter(), []); // Web
@@ -73,7 +75,7 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <ThemeProvider>
             <AuthProvider authService={authService}>
-                <ProfileProvider>
+                <ProfileProvider profileService={profileService}>
                     <ToastProvider>
                         {children}
                     </ToastProvider>
