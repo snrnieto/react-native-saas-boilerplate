@@ -23,7 +23,7 @@
 
 ## FASE 4: Sistema de Pagos Híbrido (Monetización)
 - [ ] **Task 4.1:** Definir interfaz de TypeScript `IBillingService` en `/services/billing`.
-- [ ] **Task 4.2:** Implementar `PaddleAdapter` (Web) usando el SDK de Paddle.
+- [ ] **Task 4.2:** Implementar `PaddleAdapter` (Web) usando el SDK de Paddle usando la libreria paddle-js solo para web.
 - [ ] **Task 4.3:** Implementar `RevenueCatAdapter` (Native) usando `react-native-purchases`.
 - [ ] **Task 4.4:** Crear `BillingProvider` con lógica de detección de plataforma (`Platform.OS`) para instanciar el adapter correcto.
 - [ ] **Task 4.5:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra.
