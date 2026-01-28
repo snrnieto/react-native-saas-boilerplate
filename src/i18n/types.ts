@@ -26,6 +26,7 @@ export interface IProfileTranslations {
     title: string;
     changeLanguage: string;
     theme: string;
+    description: string;
 }
 
 export interface Translation {

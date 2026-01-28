@@ -1,30 +1,30 @@
 /**
  * Input Component
- * 
+ *
  * Input reutilizable que usa el sistema de tokens del tema.
  * Soporta diferentes estados: default, error, disabled.
  */
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback, useState } from "react";
 import {
+  Platform,
+  Text,
   TextInput,
   View,
-  Text,
-  StyleSheet,
   type TextInputProps,
-  type ViewStyle,
   type TextStyle,
-} from 'react-native';
-import { useTheme } from '../../ThemeProvider';
+  type ViewStyle,
+} from "react-native";
+import { useTheme } from "../../ThemeProvider";
 
 // ============================================
 // TYPES
 // ============================================
 
-export type InputSize = 'sm' | 'md' | 'lg';
-export type InputState = 'default' | 'error' | 'disabled';
+export type InputSize = "sm" | "md" | "lg";
+export type InputState = "default" | "error" | "disabled";
 
-export interface InputProps extends Omit<TextInputProps, 'style'> {
+export interface InputProps extends Omit<TextInputProps, "style"> {
   /**
    * Input label
    */
@@ -79,13 +79,23 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
 // INPUT COMPONENT
 // ============================================
 
+// Suppress native focus outline (browser orange ring) on web
+const focusRingReset: TextStyle =
+  Platform.OS === "web"
+    ? ({
+        outlineStyle: "none",
+        outlineWidth: 0,
+        outlineColor: "transparent",
+      } as unknown as TextStyle)
+    : {};
+
 export const Input = forwardRef<TextInput, InputProps>(
   (
     {
       label,
       helperText,
-      size = 'md',
-      state = 'default',
+      size = "md",
+      state = "default",
       error = false,
       errorMessage,
       leftElement,
@@ -94,21 +104,44 @@ export const Input = forwardRef<TextInput, InputProps>(
       inputStyle,
       fullWidth = false,
       editable = true,
+      onFocus,
+      onBlur,
       ...props
     },
-    ref
+    ref,
   ) => {
     const { theme } = useTheme();
     const { colors, spacing, borders, typography } = theme;
+    const [isFocused, setIsFocused] = useState(false);
 
-    const isError = error || state === 'error';
-    const isDisabled = state === 'disabled' || !editable;
-    const finalState: InputState = isError ? 'error' : isDisabled ? 'disabled' : 'default';
+    const isError = error || state === "error";
+    const isDisabled = state === "disabled" || !editable;
+    const finalState: InputState = isError
+      ? "error"
+      : isDisabled
+        ? "disabled"
+        : "default";
+
+    const handleFocus = useCallback(
+      (e: any) => {
+        setIsFocused(true);
+        onFocus?.(e);
+      },
+      [onFocus],
+    );
+
+    const handleBlur = useCallback(
+      (e: any) => {
+        setIsFocused(false);
+        onBlur?.(e);
+      },
+      [onBlur],
+    );
 
     // Get size styles
     const getSizeStyles = (): { container: ViewStyle; input: TextStyle } => {
       switch (size) {
-        case 'sm':
+        case "sm":
           return {
             container: {
               paddingHorizontal: spacing.md,
@@ -120,7 +153,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             },
           };
 
-        case 'md':
+        case "md":
           return {
             container: {
               paddingHorizontal: spacing.md,
@@ -132,7 +165,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             },
           };
 
-        case 'lg':
+        case "lg":
           return {
             container: {
               paddingHorizontal: spacing.lg,
@@ -152,22 +185,23 @@ export const Input = forwardRef<TextInput, InputProps>(
       }
     };
 
-    // Get state styles
+    // Get state styles — thin border, subtle default, focus uses theme primary (no orange)
     const getStateStyles = (): { container: ViewStyle; input: TextStyle } => {
       const baseContainer: ViewStyle = {
-        borderWidth: borders.width.base,
-        borderRadius: borders.radius.md,
+        borderWidth: borders.width.thin,
+        borderRadius: borders.radius.lg,
         backgroundColor: colors.background.secondary,
-        borderColor: colors.border.default,
+        borderColor: colors.primaryLight,
       };
 
       const baseInput: TextStyle = {
         color: colors.text.primary,
         flex: 1,
+        ...focusRingReset,
       };
 
       switch (finalState) {
-        case 'error':
+        case "error":
           return {
             container: {
               ...baseContainer,
@@ -176,7 +210,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             input: baseInput,
           };
 
-        case 'disabled':
+        case "disabled":
           return {
             container: {
               ...baseContainer,
@@ -201,12 +235,17 @@ export const Input = forwardRef<TextInput, InputProps>(
     const sizeStyles = getSizeStyles();
     const stateStyles = getStateStyles();
 
+    // Apply focus border (theme primary) when focused and not error/disabled
+    const focusBorderColor =
+      finalState === "default" && isFocused ? colors.border.focus : undefined;
+
     const containerStyleFinal: ViewStyle = {
       ...stateStyles.container,
       ...sizeStyles.container,
-      flexDirection: 'row',
-      alignItems: 'center',
-      ...(fullWidth && { width: '100%' }),
+      ...(focusBorderColor && { borderColor: focusBorderColor }),
+      flexDirection: "row",
+      alignItems: "center",
+      ...(fullWidth && { width: "100%" }),
       ...containerStyle,
     };
 
@@ -220,7 +259,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     const helperTextColor = isError ? colors.error : colors.text.secondary;
 
     return (
-      <View style={fullWidth ? { width: '100%' } : undefined}>
+      <View style={fullWidth ? { width: "100%" } : undefined}>
         {label && (
           <Text
             style={{
@@ -244,6 +283,9 @@ export const Input = forwardRef<TextInput, InputProps>(
             style={inputStyleFinal}
             placeholderTextColor={colors.text.tertiary}
             editable={!isDisabled}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            underlineColorAndroid="transparent"
             {...props}
           />
 
@@ -265,7 +307,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         )}
       </View>
     );
-  }
+  },
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";

@@ -27,5 +27,6 @@ export const es: Translation = {
         title: 'Perfil',
         changeLanguage: 'Cambiar Idioma',
         theme: 'Tema',
+        description: 'Gestiona tu información personal',
     },
 };

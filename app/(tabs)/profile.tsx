@@ -155,7 +155,7 @@ export default function ProfileScreen() {
                             color: colors.text.secondary,
                         }}
                     >
-                        Manage your personal information
+                        {t('profile.description')}
                     </Text>
                 </View>
 
