@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@paddle/paddle-js": "^1.6.1",
     "@prisma/client": "^6.19.2",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/native": "^7.1.8",

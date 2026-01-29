@@ -28,7 +28,7 @@
 
 - [x] **Task 4.1:** Diseñar e implementar en Prisma el **schema de suscripciones** en la DB, teniendo en cuenta **múltiples proveedores** (Paddle para web, RevenueCat para móvil). Debe normalizar estado, plan y IDs por proveedor para que backend y webhooks puedan reconciliar ambos orígenes. _Prerrequisito antes de crear los services de billing._
 - [x] **Task 4.2:** Definir interfaz de TypeScript `IBillingService` en `/services/billing`.
-- [ ] **Task 4.3:** Implementar `PaddleAdapter` (Web) usando el S_DK de Paddle usando la libreria paddle-js solo para web.
+- [x] **Task 4.3:** Implementar `PaddleAdapter` (Web) usando el SDK de Paddle usando la libreria paddle-js solo para web.
 - [ ] **Task 4.4:** Implementar `RevenueCatAdapter` (Native) usando `react-native-purchases`.
 - [ ] **Task 4.5:** Crear `BillingProvider` con lógica de detección de plataforma (`Platform.OS`) para instanciar el adapter correcto.
 - [ ] **Task 4.6:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra.
