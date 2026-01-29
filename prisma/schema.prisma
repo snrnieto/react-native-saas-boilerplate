@@ -20,6 +20,47 @@ datasource db {
 // Business logic models reference Supabase auth users via their UUID.
 
 // ============================================
+// SUBSCRIPTIONS (multi-provider: Paddle, RevenueCat)
+// ============================================
+
+enum SubscriptionProvider {
+  PADDLE
+  REVENUECAT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  TRIALING
+  EXPIRED
+}
+
+enum PlanType {
+  FREE
+  PRO
+}
+
+/// Subscription state per user per provider. Updated by webhooks; app only reads.
+model Subscription {
+  id               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String               @map("user_id") @db.Uuid // References auth.users(id) in Supabase
+  provider         SubscriptionProvider
+  externalId       String               @map("external_id") // Provider's subscription/customer id for webhook lookup
+  status           SubscriptionStatus
+  planType         PlanType             @map("plan_type")
+  currentPeriodEnd DateTime?            @map("current_period_end")
+  metadata         Json?                @db.JsonB
+  createdAt        DateTime             @default(dbgenerated("now()")) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  @@unique([userId, provider])
+  @@unique([provider, externalId])
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+// ============================================
 // USER PROFILE
 // ============================================
 
