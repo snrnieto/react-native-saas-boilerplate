@@ -35,9 +35,13 @@ export interface SubscriptionRecord {
   userId: string;
   provider: SubscriptionProvider;
   externalId: string;
+  externalProductId: string | null;
   status: SubscriptionStatus;
   planType: PlanType;
+  currentPeriodStart: string | null; // ISO 8601 datetime string
   currentPeriodEnd: string | null; // ISO 8601 datetime string
+  cancelAtPeriodEnd: boolean;
+  canceledAt: string | null; // ISO 8601 datetime string
   metadata: Record<string, unknown> | null;
   createdAt: string; // ISO 8601 datetime string
   updatedAt: string; // ISO 8601 datetime string
@@ -58,6 +62,9 @@ export interface SubscriptionRecord {
 export interface SubscriptionStatusResult {
   isActive: boolean;
   planType: PlanType;
+  currentPeriodStart: string | null; // ISO 8601 datetime string
   currentPeriodEnd: string | null; // ISO 8601 datetime string
+  /** User cancelled but remains active until currentPeriodEnd. */
+  cancelAtPeriodEnd: boolean;
   subscriptions?: SubscriptionRecord[];
 }

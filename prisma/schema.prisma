@@ -46,10 +46,14 @@ model Subscription {
   id               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId           String               @map("user_id") @db.Uuid // References auth.users(id) in Supabase
   provider         SubscriptionProvider
-  externalId       String               @map("external_id") // Provider's subscription/customer id for webhook lookup
+  externalId       String               @map("external_id") // Provider's subscription id for webhook lookup
+  externalProductId String?             @map("external_product_id") // Provider's plan/product id (Paddle plan_id, RevenueCat entitlement)
   status           SubscriptionStatus
   planType         PlanType             @map("plan_type")
+  currentPeriodStart DateTime?          @map("current_period_start")
   currentPeriodEnd DateTime?            @map("current_period_end")
+  cancelAtPeriodEnd Boolean            @default(false) @map("cancel_at_period_end") // User cancelled but active until period end
+  canceledAt       DateTime?           @map("canceled_at") // When user cancelled (for history/analytics)
   metadata         Json?                @db.JsonB
   createdAt        DateTime             @default(dbgenerated("now()")) @map("created_at")
   updatedAt        DateTime             @updatedAt @map("updated_at")
@@ -64,8 +68,9 @@ model Subscription {
 // USER PROFILE
 // ============================================
 
-/// Extended user profile information
-/// References auth.users(id) from Supabase Auth
+/// Extended user profile information (bio, avatar, preferences).
+/// References auth.users(id) from Supabase Auth.
+/// Subscription state is managed only in the subscriptions table, keyed by userId (ISubscriptionService).
 model Profile {
   id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId String @unique @map("user_id") @db.Uuid // References auth.users(id) in Supabase
