@@ -26,18 +26,20 @@
 
 ## FASE 4: Sistema de Pagos Híbrido (Monetización)
 
+**Orden lógico:** Billing (pagos) → Backend suscripciones (schema + webhooks) → Estado suscripción en app (adapter + provider) → Paywall.
+
 - [x] **Task 4.1:** Diseñar e implementar en Prisma el **schema de suscripciones** en la DB, teniendo en cuenta **múltiples proveedores** (Paddle para web, RevenueCat para móvil). Debe normalizar estado, plan y IDs por proveedor para que backend y webhooks puedan reconciliar ambos orígenes. _Prerrequisito antes de crear los services de billing._
 - [x] **Task 4.2:** Definir interfaz de TypeScript `IBillingService` en `/services/billing`.
 - [x] **Task 4.3:** Implementar `PaddleAdapter` (Web) usando el SDK de Paddle usando la libreria paddle-js solo para web.
 - [ ] **Task 4.4:** Implementar `RevenueCatAdapter` (Native) usando `react-native-purchases`. _(Diferido: BillingProvider ya usa `NativeBillingPlaceholder` en native hasta que se implemente 4.4.)_
 - [x] **Task 4.5:** Crear `BillingProvider` con lógica de detección de plataforma (`Platform.OS`) para instanciar el adapter correcto (Paddle/RevenueCat) y exponer flujo de pago.
-- [ ] **Task 4.6:** Implementar adapter que cumpla `ISubscriptionService` (ej. `SupabaseSubscriptionAdapter`) leyendo de la tabla de suscripciones en la DB.
-- [ ] **Task 4.7:** Crear `SubscriptionProvider` (SubscriptionContext + SubscriptionProvider) que exponga el estado de suscripción (`isActive`, `planType`) de forma global para el paywall y el resto de la app.
-- [ ] **Task 4.8:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra.
+- [ ] **Task 4.6:** Actualizar `schema.prisma` si aplica (ej. campos de resumen de suscripción en `Profile` o vista) para que la app pueda leer estado de suscripción. _El modelo `Subscription` ya existe (4.1); esta tarea es refinamiento/denormalización._
+- [ ] **Task 4.7:** Boilerplate de Edge Function (Supabase/Cloudflare) para recibir Webhooks de Paddle/RevenueCat y actualizar la tabla de suscripciones. _Sin esto, la tabla no se llena al pagar._
+- [ ] **Task 4.8:** Implementar adapter que cumpla `ISubscriptionService` (ej. `SupabaseSubscriptionAdapter`) leyendo de la tabla de suscripciones en la DB. _Requiere 4.1 (tabla) y conviene tener 4.7 (webhooks) para tener datos._
+- [ ] **Task 4.9:** Crear `SubscriptionProvider` (SubscriptionContext + SubscriptionProvider) que exponga el estado de suscripción (`isActive`, `planType`) de forma global para el paywall y el resto de la app.
+- [ ] **Task 4.10:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra. _Usa BillingProvider (pago) y SubscriptionProvider (estado)._
 
 ## FASE 5: Integración Final y Sincronización (Backend)
 
-- [ ] **Task 5.1:** Actualizar `schema.prisma` para incluir campos de suscripción (`subscription_id`, `plan_type`, `status`).
-- [ ] **Task 5.2:** Boilerplate de Edge Function (Supabase/Cloudflare) para recibir Webhooks de Paddle/RevenueCat.
-- [ ] **Task 5.3:** Implementar lógica de "Restore Purchases" en los adapters.
-- [ ] **Task 5.4:** Testing E2E básico de flujo: Registro -> Pago -> Acceso a contador Pro.
+- [ ] **Task 5.1:** Implementar lógica de "Restore Purchases" en los adapters de billing (Paddle/RevenueCat).
+- [ ] **Task 5.2:** Testing E2E básico de flujo: Registro -> Pago -> Acceso a contador Pro.
