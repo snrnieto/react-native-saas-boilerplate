@@ -14,6 +14,7 @@ import { useMemo, type ReactNode } from 'react';
 import { SupabaseAuthAdapter, SupabaseProfileAdapter } from '../adapters/supabase';
 import { ToastProvider } from '../ui/components/Toast/ToastContext';
 import { AuthProvider } from './auth';
+import { BillingProvider } from './billing';
 import { ProfileProvider } from './profile/ProfileContext';
 
 // TODO: Future adapters can be imported here
@@ -32,6 +33,7 @@ export interface ProvidersProps {
  * Current Integrations:
  * - AuthProvider: Authentication (SupabaseAuthAdapter, injected)
  * - ProfileProvider: Profile data (SupabaseProfileAdapter, injected)
+ * - BillingProvider: Billing/payment (Paddle on web, native placeholder until RevenueCat – Task 4.4)
  *
  * To add a new provider:
  * 1. Import the provider component
@@ -60,9 +62,8 @@ export function AppProviders({ children }: ProvidersProps) {
     const authService = useMemo(() => new SupabaseAuthAdapter(), []);
     const profileService = useMemo(() => new SupabaseProfileAdapter(), []);
 
+    // Billing: BillingProvider instantiates Paddle (web) or native placeholder (Task 4.4: RevenueCat) by Platform.OS
     // TODO: Future adapter instantiations
-    // const billingService = useMemo(() => new PaddleAdapter(), []); // Web
-    // const billingService = useMemo(() => new RevenueCatAdapter(), []); // Native
     // const analyticsService = useMemo(() => new MixpanelAdapter(), []);
 
     // ============================================
@@ -74,9 +75,11 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <AuthProvider authService={authService}>
             <ProfileProvider profileService={profileService}>
-                <ToastProvider>
-                    {children}
-                </ToastProvider>
+                <BillingProvider>
+                    <ToastProvider>
+                        {children}
+                    </ToastProvider>
+                </BillingProvider>
             </ProfileProvider>
         </AuthProvider>
     );

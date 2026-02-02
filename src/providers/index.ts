@@ -3,5 +3,12 @@
  * Barrel export for all providers
  */
 
-export { AppProviders, type ProvidersProps } from './Providers';
-export { AuthProvider, useAuth, type AuthProviderProps, type AuthContextValue } from './auth';
+export { AuthProvider, useAuth, type AuthContextValue, type AuthProviderProps } from "./auth";
+export {
+  BillingProvider,
+  useBilling,
+  type BillingContextValue,
+  type BillingPlatform,
+  type BillingProviderProps,
+} from "./billing";
+export { AppProviders, type ProvidersProps } from "./Providers";
