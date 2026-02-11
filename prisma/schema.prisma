@@ -65,6 +65,31 @@ model Subscription {
 }
 
 // ============================================
+// WEBHOOK EVENTS (audit / idempotency for Edge Functions)
+// ============================================
+
+enum WebhookProvider {
+  PADDLE
+  REVENUECAT
+}
+
+/// Log of webhook payloads for idempotency and debugging. Edge Functions insert before processing.
+model WebhookEvent {
+  id          String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provider    WebhookProvider
+  eventId     String         @map("event_id") // Provider's event id (e.g. Paddle event id, RevenueCat event id)
+  payload     Json           @db.JsonB
+  processedAt DateTime?      @map("processed_at")
+  success     Boolean        @default(false)
+  errorMessage String?       @map("error_message")
+  createdAt   DateTime       @default(dbgenerated("now()")) @map("created_at")
+
+  @@unique([provider, eventId])
+  @@index([provider])
+  @@map("webhook_events")
+}
+
+// ============================================
 // USER PROFILE
 // ============================================
 

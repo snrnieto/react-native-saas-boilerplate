@@ -34,7 +34,7 @@
 - [ ] **Task 4.4:** Implementar `RevenueCatAdapter` (Native) usando `react-native-purchases`. _(Diferido: BillingProvider ya usa `NativeBillingPlaceholder` en native hasta que se implemente 4.4.)_
 - [x] **Task 4.5:** Crear `BillingProvider` con lógica de detección de plataforma (`Platform.OS`) para instanciar el adapter correcto (Paddle/RevenueCat) y exponer flujo de pago.
 - [x] **Task 4.6:** Confirmar diseño: **Profile** solo para datos de perfil (bio, avatar, preferencias). **Suscripciones** se gestionan íntegramente en la tabla `subscriptions` por `userId`; la app lee estado vía `ISubscriptionService` / adapter (4.8). _Sin denormalización en Profile._
-- [ ] **Task 4.7:** Boilerplate de Edge Function (Supabase/Cloudflare) para recibir Webhooks de Paddle/RevenueCat y actualizar la tabla de suscripciones. _Sin esto, la tabla no se llena al pagar._
+- [x] **Task 4.7:** Boilerplate de Edge Function (Supabase/Cloudflare) para recibir Webhooks de Paddle/RevenueCat y actualizar la tabla de suscripciones. _Sin esto, la tabla no se llena al pagar._
 - [ ] **Task 4.8:** Implementar adapter que cumpla `ISubscriptionService` (ej. `SupabaseSubscriptionAdapter`) leyendo de la tabla de suscripciones en la DB. _Requiere 4.1 (tabla) y conviene tener 4.7 (webhooks) para tener datos._
 - [ ] **Task 4.9:** Crear `SubscriptionProvider` (SubscriptionContext + SubscriptionProvider) que exponga el estado de suscripción (`isActive`, `planType`) de forma global para el paywall y el resto de la app.
 - [ ] **Task 4.10:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra. _Usa BillingProvider (pago) y SubscriptionProvider (estado)._

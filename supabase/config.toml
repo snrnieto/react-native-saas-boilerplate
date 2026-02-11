@@ -1,0 +1,9 @@
+# Supabase project config (Edge Functions).
+# Database is managed via Prisma; this config is for functions deploy.
+
+# Webhooks are called by Paddle/RevenueCat without a Supabase JWT.
+[functions.paddle-webhook]
+verify_jwt = false
+
+[functions.revenuecat-webhook]
+verify_jwt = false

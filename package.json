@@ -22,7 +22,10 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "supabase:login": "supabase login",
+    "supabase:link": "supabase link",
+    "supabase:functions:deploy": "supabase functions deploy --no-verify-jwt"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -59,6 +62,7 @@
     "@types/react": "~19.1.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "prisma": "^6.2.0",
+    "supabase": "^2.0.0",
     "react-test-renderer": "19.1.0",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.2"
