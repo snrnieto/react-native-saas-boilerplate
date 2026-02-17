@@ -37,7 +37,7 @@
 - [x] **Task 4.7:** Boilerplate de Edge Function (Supabase/Cloudflare) para recibir Webhooks de Paddle/RevenueCat y actualizar la tabla de suscripciones. _Sin esto, la tabla no se llena al pagar._
 - [x] **Task 4.8:** Implementar adapter que cumpla `ISubscriptionService` (ej. `SupabaseSubscriptionAdapter`) leyendo de la tabla de suscripciones en la DB. _Requiere 4.1 (tabla) y conviene tener 4.7 (webhooks) para tener datos._
 - [x] **Task 4.9:** Crear `SubscriptionProvider` (SubscriptionContext + SubscriptionProvider) que exponga el estado de suscripción (`isActive`, `planType`) de forma global para el paywall y el resto de la app.
-- [ ] **Task 4.10:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra. _Usa BillingProvider (pago) y SubscriptionProvider (estado)._
+- [x] **Task 4.10:** Crear pantalla de "Suscripción" (Paywall) que muestre productos y maneje el flujo de compra. _Usa BillingProvider (pago) y SubscriptionProvider (estado)._
 
 ## FASE 5: Integración Final y Sincronización (Backend)
 

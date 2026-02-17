@@ -28,6 +28,12 @@ export default function TabLayout() {
           title: "Profile",
         }}
       />
+      <Tabs.Screen
+        name="subscription"
+        options={{
+          title: "Subscription",
+        }}
+      />
     </Tabs>
   );
 }

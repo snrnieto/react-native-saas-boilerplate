@@ -32,6 +32,7 @@ type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 const ROUTE_ICONS: Record<string, FeatherIconName> = {
   index: "home",
   profile: "user",
+  subscription: "credit-card",
 };
 
 const springConfig = { damping: 15, stiffness: 150 };
