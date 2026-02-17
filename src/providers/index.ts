@@ -11,4 +11,10 @@ export {
   type BillingPlatform,
   type BillingProviderProps,
 } from "./billing";
+export {
+  SubscriptionProvider,
+  useSubscription,
+  type SubscriptionContextValue,
+  type SubscriptionProviderProps,
+} from "./subscription";
 export { AppProviders, type ProvidersProps } from "./Providers";

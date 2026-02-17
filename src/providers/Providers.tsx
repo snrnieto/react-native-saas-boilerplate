@@ -11,11 +11,12 @@
  */
 
 import { useMemo, type ReactNode } from 'react';
-import { SupabaseAuthAdapter, SupabaseProfileAdapter } from '../adapters/supabase';
+import { SupabaseAuthAdapter, SupabaseProfileAdapter, SupabaseSubscriptionAdapter } from '../adapters/supabase';
 import { ToastProvider } from '../ui/components/Toast/ToastContext';
 import { AuthProvider } from './auth';
 import { BillingProvider } from './billing';
 import { ProfileProvider } from './profile/ProfileContext';
+import { SubscriptionProvider } from './subscription';
 
 // TODO: Future adapters can be imported here
 // import { FirebaseAuthAdapter } from '../adapters/firebase';
@@ -61,6 +62,7 @@ export function AppProviders({ children }: ProvidersProps) {
      */
     const authService = useMemo(() => new SupabaseAuthAdapter(), []);
     const profileService = useMemo(() => new SupabaseProfileAdapter(), []);
+    const subscriptionService = useMemo(() => new SupabaseSubscriptionAdapter(), []);
 
     // Billing: BillingProvider instantiates Paddle (web) or native placeholder (Task 4.4: RevenueCat) by Platform.OS
     // TODO: Future adapter instantiations
@@ -75,11 +77,13 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <AuthProvider authService={authService}>
             <ProfileProvider profileService={profileService}>
-                <BillingProvider>
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
-                </BillingProvider>
+                <SubscriptionProvider subscriptionService={subscriptionService}>
+                    <BillingProvider>
+                        <ToastProvider>
+                            {children}
+                        </ToastProvider>
+                    </BillingProvider>
+                </SubscriptionProvider>
             </ProfileProvider>
         </AuthProvider>
     );
