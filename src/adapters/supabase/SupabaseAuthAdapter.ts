@@ -24,6 +24,7 @@ import type {
 } from "../../services/auth/types";
 import { AuthError, AuthErrorCode } from "../../services/auth/types";
 
+import Constants from "expo-constants";
 import { supabaseClient } from "./client";
 import {
   mapSupabaseErrorToAuthError,
@@ -286,115 +287,29 @@ export class SupabaseAuthAdapter implements IAuthService {
   // ============================================
 
   /**
-   * Check if a user exists with the given email
-   * 
-   * We try to get the user by email using Supabase Auth API.
-   * However, Supabase doesn't expose a direct "getUserByEmail" method from the client.
-   * 
-   * Alternative approach: Try to sign in with dummy credentials.
-   * If we get "invalid credentials", we can't distinguish between:
-   * - User doesn't exist
-   * - User exists but password is wrong
-   * 
-   * So we use a more reliable method: check if we can get user info by attempting
-   * a password reset and checking the response, OR we try to query the auth.users
-   * table directly (if we have RLS policies that allow it).
-   * 
-   * For now, we'll use a simpler approach: attempt sign-in and check the error.
-   * If error explicitly says "user not found", return false.
-   * Otherwise, we can't be certain, so we'll be conservative.
-   */
-  async checkUserExists(email: string): Promise<boolean> {
-    try {
-      // Method 1: Try to sign in with dummy password
-      // This will fail, but the error message might tell us if user exists
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password: 'dummy_password_check_12345!@#$',
-      });
-
-      if (error) {
-        const errorMessage = error.message?.toLowerCase() || '';
-        const errorCode = (error as any).code || '';
-        
-        // If error explicitly says user/email not found, user doesn't exist
-        if (errorMessage.includes('user not found') || 
-            errorMessage.includes('email not found') ||
-            errorCode === 'user_not_found') {
-          return false;
-        }
-        
-        // If we get "invalid login credentials" or "invalid email or password"
-        // Supabase intentionally doesn't distinguish between "user doesn't exist" 
-        // and "wrong password" for security. 
-        // 
-        // Since we can't be certain, we return false to be conservative.
-        // This prevents sending emails to non-existent users.
-        if (errorMessage.includes('invalid login credentials') ||
-            errorMessage.includes('invalid email or password') ||
-            errorCode === 'invalid_credentials') {
-          // We can't distinguish between "user doesn't exist" and "wrong password"
-          // Return false to be safe and prevent false positives
-          return false;
-        }
-        
-        // For other errors, assume user doesn't exist
-        return false;
-      }
-
-      // If no error (shouldn't happen with dummy password), user exists
-      // But we should sign out immediately
-      await supabaseClient.auth.signOut();
-      return true;
-    } catch (error) {
-      // On any error, assume user doesn't exist to be safe
-      console.error('Error checking if user exists:', error);
-      return false;
-    }
-  }
-
-  /**
    * Send password reset email
-   * Verifies user exists before sending email
+   *
+   * Note: We do NOT check if the user exists before sending, because Supabase
+   * intentionally returns "invalid credentials" for both "user doesn't exist"
+   * and "wrong password" - so we cannot reliably distinguish them. Calling
+   * resetPasswordForEmail directly: if the user exists, Supabase sends the email;
+   * if not, Supabase returns success anyway (security best practice - no email enumeration).
    */
   async resetPassword(email: string): Promise<PasswordResetResponse> {
     try {
-      // First, verify that the user exists
-      const userExists = await this.checkUserExists(email);
-      if (!userExists) {
-        throw new AuthError(
-          AuthErrorCode.USER_NOT_FOUND,
-          "No account found with this email address"
-        );
-      }
-
-      // User might exist, proceed with password reset
-      // Note: Supabase's resetPasswordForEmail will succeed even if user doesn't exist
-      // (for security reasons), so we rely on checkUserExists to filter invalid emails
       const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window?.location?.origin || "myapp://"}auth/reset-password`,
+        redirectTo: typeof window !== "undefined" && window?.location?.origin
+          ? `${window.location.origin}/auth/reset-password`
+          : `${Constants.expoConfig?.scheme ?? "reactnativesaasboilerplate"}://auth/reset-password`,
       });
 
       if (error) {
-        // Check if error indicates user doesn't exist
-        const errorMessage = error.message?.toLowerCase() || '';
-        const errorCode = (error as any).code || '';
-        
-        if (errorMessage.includes('user not found') || 
-            errorMessage.includes('email not found') ||
-            errorCode === 'user_not_found') {
-          throw new AuthError(
-            AuthErrorCode.USER_NOT_FOUND,
-            "No account found with this email address"
-          );
-        }
-        
         throw mapSupabaseErrorToAuthError(error, "Failed to send reset email");
       }
 
       return {
         success: true,
-        message: "Password reset email sent successfully",
+        message: "If an account exists with this email, you will receive a password reset link.",
       };
     } catch (error) {
       if (error instanceof AuthError) {

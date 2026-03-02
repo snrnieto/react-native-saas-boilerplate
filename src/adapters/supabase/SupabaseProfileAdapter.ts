@@ -16,23 +16,16 @@ export class SupabaseProfileAdapter implements IProfileService {
                 .from('profiles')
                 .select('*')
                 .eq('user_id', userId)
-                .single();
+                .maybeSingle();
 
             if (error) {
-                // If code is PGRST116, it means no rows returned (profile doesn't exist)
-                if (error.code === 'PGRST116') {
-                    return null;
-                }
                 console.error('Error fetching profile:', error);
                 throw error;
             }
 
+            if (!data) return null;
             return this.mapResponseToProfile(data);
         } catch (error) {
-            // If it's a known "no rows" error, return null
-            if ((error as any)?.code === 'PGRST116') {
-                return null;
-            }
             throw error;
         }
     }

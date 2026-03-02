@@ -132,8 +132,10 @@ export function AuthProvider({
                 }
 
                 case 'PASSWORD_RECOVERY': {
-                    // Password recovery doesn't change user/session state
-                    // But we might want to handle this differently in the future
+                    // User opened recovery link - session established, update state
+                    const currentUser = await authService.getCurrentUser();
+                    setUser(currentUser);
+                    setSession(newSession);
                     break;
                 }
             }

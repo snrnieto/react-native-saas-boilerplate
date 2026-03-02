@@ -12,11 +12,19 @@ export interface IAuthTranslations {
     resetPasswordDescription: string;
     resetPasswordSuccess: string;
     resetPasswordSuccessMessage: string;
+    setNewPasswordTitle: string;
+    setNewPasswordDescription: string;
+    newPasswordPlaceholder: string;
+    confirmPasswordPlaceholder: string;
+    passwordUpdatedSuccess: string;
+    invalidResetLink: string;
+    passwordsDoNotMatch: string;
     backToLogin: string;
     rememberPassword: string;
     error: {
         invalidEmail: string;
         weakPassword: string;
+        passwordRequired: string;
         generic: string;
     };
 }
